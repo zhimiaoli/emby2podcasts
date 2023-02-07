@@ -14,7 +14,7 @@ podcastTpl = """<?xml version="1.0" encoding="UTF-8"?>
 <language>zh-cn</language>
 <itunes:subtitle>{{basicInfoData['Name']}}</itunes:subtitle>
 <itunes:author>{{basicInfoData.get("AlbumArtist","")}}</itunes:author>
-<itunes:image href="{{emby_file_server}}/emby/Items/{{basicInfoData["Id"]}}/Images/Primary?width=500&height=500"/>
+<itunes:image href="{{emby_file_server}}/emby/Items/{{basicInfoData["Id"]}}/Images/Primary%3Fwidth%3D500%26height%3D500"/>
 <itunes:summary><![CDATA[ {{basicInfoData.get("Overview","")}}]]></itunes:summary>
 <description><![CDATA[{{basicInfoData.get("Overview","")}}]]></description>
 <itunes:owner>
@@ -44,10 +44,12 @@ def loadConfig():
     if os.path.exists("config.json"): 
         configfilename = "config.json"
         configData = open(configfilename,"r",encoding="utf-8").read()
+        print("using config.json")
         return json.loads(configData)
     elif os.path.exists("/config/config.json"):
         configfilename = "/config/config.json"
         configData = open(configfilename,"r",encoding="utf-8").read()
+        print("using /config/config.json")
         return json.loads(configData)
     else:
         sys.exit(0)
