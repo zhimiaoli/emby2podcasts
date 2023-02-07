@@ -14,7 +14,7 @@ podcastTpl = """<?xml version="1.0" encoding="UTF-8"?>
 <language>zh-cn</language>
 <itunes:subtitle>{{basicInfoData['Name']}}</itunes:subtitle>
 <itunes:author>{{basicInfoData.get("AlbumArtist","")}}</itunes:author>
-<itunes:image href="{{emby_file_server}}/emby/Items/{{basicInfoData["Id"]}}/Images/Primary%3Fwidth%3D500%26height%3D500"/>
+<itunes:image href="{{emby_file_server}}/emby/Items/{{basicInfoData["Id"]}}/Images/Primary"/>
 <itunes:summary><![CDATA[ {{basicInfoData.get("Overview","")}}]]></itunes:summary>
 <description><![CDATA[{{basicInfoData.get("Overview","")}}]]></description>
 <itunes:owner>
@@ -28,7 +28,7 @@ podcastTpl = """<?xml version="1.0" encoding="UTF-8"?>
     <title>{{ep["IndexNumber"]}}{{"."+ep["Name"]}}</title>
     <itunes:summary><![CDATA[ {{ep.get("Overview","")}}]]></itunes:summary>
     <description><![CDATA[ {{ep.get("Overview","")}}]]></description>
-    <enclosure url="{{baseURL}}{{'/audio/'+ep['Id']}}" type="audio/mpeg"></enclosure>
+    <enclosure url="{{baseURL}}{{'/audio/'+ep['Id']}}.{{ep['Container']}}" type="audio/mpeg"></enclosure>
     <pubDate>Tue, 07 Feb 2023 16:01:07 +0000</pubDate>
     <itunes:author>{{basicInfoData.get("AlbumArtist","Unknow")}}</itunes:author>
     <itunes:duration>{{ep["RunTimeTicks"]/10000000 | int}}</itunes:duration>
@@ -66,7 +66,7 @@ def podcast(id):
     # 生成podcast的播客
     r = requests.session()
     basicInfo = r.get("{emby_api_server}/emby/Users/{user_id}/Items/{id}?api_key={api_key}".format(emby_api_server=config["emby_api_server"],user_id=config["user_id"],id=id,api_key=config["api_key"]))
-    eposides = r.get("{emby_api_server}/emby/Items?ParentId={id}&api_key={api_key}".format(emby_api_server=config["emby_api_server"],api_key=config["api_key"],id=id))
+    eposides = r.get("{emby_api_server}/emby/Items?ParentId={id}&api_key={api_key}&Fields=BasicSyncInfo%2CCanDelete%2CContainer%2CPrimaryImageAspectRatio%2COverview&ImageTypeLimit=1".format(emby_api_server=config["emby_api_server"],api_key=config["api_key"],id=id))
     if basicInfo.status_code == 200 and eposides.status_code == 200:
         basicInfoData = basicInfo.json()
         eposidesList = eposides.json()
@@ -75,6 +75,12 @@ def podcast(id):
         return abort(basicInfo.status_code)
     return Response(xmlStr, mimetype='application/xml')
 
-@app.route("/audio/<audioid>")
-def serverAudio(audioid):
-    return redirect("{emby_file_server}/emby/Audio/{audioid}/stream?api_key={api_key}&static=true".format(api_key=config["api_key"],emby_file_server=config["emby_file_server"],audioid=audioid),302)
+@app.route("/audio/<audiofile>")
+def serverAudio(audiofile):
+    audioid,container = audiofile.split(".")
+    if container == "mp3":
+        print("mp3 container, direct stream.")
+        return redirect("{emby_file_server}/emby/Audio/{audioid}/stream?api_key={api_key}&static=true".format(api_key=config["api_key"],emby_file_server=config["emby_file_server"],audioid=audioid),302)
+    else:
+        print("other container, transcoding.")
+        return redirect("{emby_file_server}/emby/Audio/{audioid}/stream.mp3?api_key={api_key}".format(api_key=config["api_key"],emby_file_server=config["emby_file_server"],audioid=audioid),302)
