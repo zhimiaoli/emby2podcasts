@@ -9,10 +9,10 @@ app = Flask(__name__)
 podcastTpl = """<?xml version="1.0" encoding="UTF-8"?>
 <rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" version="2.0">
 <channel>
-<title>{{basicInfoData['Name']}}</title>
+<title>{{basicInfoData['Name']|e}}</title>
 <link>https://github.com/zhimiaoli/emby2podcasts</link>
 <language>zh-cn</language>
-<itunes:subtitle>{{basicInfoData['Name']}}</itunes:subtitle>
+<itunes:subtitle>{{basicInfoData['Name']|e}}</itunes:subtitle>
 <itunes:author>{{basicInfoData.get("AlbumArtist","")}}</itunes:author>
 <itunes:image href="{{emby_file_server}}/emby/Items/{{basicInfoData["Id"]}}/Images/Primary"/>
 <itunes:summary><![CDATA[ {{basicInfoData.get("Overview","")}}]]></itunes:summary>
@@ -22,10 +22,10 @@ podcastTpl = """<?xml version="1.0" encoding="UTF-8"?>
     <itunes:email>me@example.com</itunes:email>
 </itunes:owner>
 <itunes:explicit>no</itunes:explicit>
-
+{% set count = namespace(value=1) %}
 {% for ep in eps %}
 <item>
-    <title>{{ep["IndexNumber"]}}{{"."+ep["Name"]}}</title>
+    <title>{{ep.get("IndexNumber",count.value)}}{{"."+ep["Name"]|e}}</title>
     <itunes:summary><![CDATA[ {{ep.get("Overview","")}}]]></itunes:summary>
     <description><![CDATA[ {{ep.get("Overview","")}}]]></description>
     <enclosure url="{{baseURL}}{{'/audio/'+ep['Id']}}.{{ep['Container']}}" type="audio/mpeg"></enclosure>
@@ -34,6 +34,7 @@ podcastTpl = """<?xml version="1.0" encoding="UTF-8"?>
     <itunes:duration>{{ep["RunTimeTicks"]/10000000 | int}}</itunes:duration>
     <itunes:explicit>no</itunes:explicit>
     <guid>{{ep["ServerId"]}}-{{ep["Id"]}}</guid>
+    {% set count.value = count.value + 1 %}
 </item> 
 {% endfor %}
 </channel>
