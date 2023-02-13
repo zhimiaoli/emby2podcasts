@@ -31,7 +31,7 @@ podcastTpl = """<?xml version="1.0" encoding="UTF-8"?>
     <enclosure url="{{baseURL}}{{'/audio/'+ep['Id']}}.{{ep['Container']}}" type="audio/mpeg"></enclosure>
     <pubDate>Tue, 07 Feb 2023 16:01:07 +0000</pubDate>
     <itunes:author>{{basicInfoData.get("AlbumArtist","Unknow")}}</itunes:author>
-    <itunes:duration>{{ep["RunTimeTicks"]/10000000 | int}}</itunes:duration>
+    <itunes:duration>{{(ep["RunTimeTicks"]/10000000)|int}}</itunes:duration>
     <itunes:explicit>no</itunes:explicit>
     <guid>{{ep["ServerId"]}}-{{ep["Id"]}}</guid>
     {% set count.value = count.value + 1 %}
