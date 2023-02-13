@@ -4,5 +4,6 @@
     "api_key":"790d6d475ce",
     "emby_api_server":"http://192.168.2.2:8099",
     "emby_file_server":"https://testserver.ddsnto.com",
+    "emby_image_server":"https://testserver.ddsnto.com",
     "useCache":true
 }

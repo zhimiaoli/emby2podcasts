@@ -5,8 +5,11 @@ I've using emby for managing my audiobooks for some time, but didn't find a dece
 2. change playback speed.
 3. sleep timer.
 4. download for offline listens.
+5. chapter aware for m4b files.
 
 just unable to sync with the emby library, but after finish one book, you can always mark that book as listened.
+
+recommended using `m4b`,`mp3` and `m4a` files.
 
 ## installation
 using Docker to run this application.
@@ -18,4 +21,5 @@ rename `config-example.json` to `config.json`, replace with your own api keys an
 I recommend using the apple podcast app,as for android, pocket casts maybe the app. 
 
 ## Todo
- [ ] add link to mark the album as listened.
+- [ ] add link to mark the album as listened.
+- [ ] add diffrent publish date instead of the fixed date to have better sorting.

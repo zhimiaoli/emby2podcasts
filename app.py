@@ -14,7 +14,7 @@ podcastTpl = """<?xml version="1.0" encoding="UTF-8"?>
 <language>zh-cn</language>
 <itunes:subtitle>{{basicInfoData['Name']|e}}</itunes:subtitle>
 <itunes:author>{{basicInfoData.get("AlbumArtist","")}}</itunes:author>
-<itunes:image href="{{emby_file_server}}/emby/Items/{{basicInfoData["Id"]}}/Images/Primary"/>
+<itunes:image href="{{emby_image_server}}/emby/Items/{{basicInfoData["Id"]}}/Images/Primary"/>
 <itunes:summary><![CDATA[ {{basicInfoData.get("Overview","")}}]]></itunes:summary>
 <description><![CDATA[{{basicInfoData.get("Overview","")}}]]></description>
 <itunes:owner>
@@ -74,7 +74,8 @@ def podcast(id):
         for ep in eposidesList["Items"]:
             if ep["Container"] == "mp4" and ep["MediaType"] == "Audio":
                 ep["Container"] = "m4a"
-        xmlStr = Template(podcastTpl).render(basicInfoData=basicInfoData,eps=eposidesList["Items"],baseURL = config["baseURL"],emby_file_server=config["emby_file_server"])
+        xmlStr = Template(podcastTpl).render(basicInfoData=basicInfoData,eps=eposidesList["Items"],baseURL = config["baseURL"],
+                                             emby_file_server=config["emby_file_server"],emby_image_server=config["emby_image_server"])
     else:
         return abort(basicInfo.status_code)
     return Response(xmlStr, mimetype='application/xml')
