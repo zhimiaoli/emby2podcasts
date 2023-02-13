@@ -71,6 +71,9 @@ def podcast(id):
     if basicInfo.status_code == 200 and eposides.status_code == 200:
         basicInfoData = basicInfo.json()
         eposidesList = eposides.json()
+        for ep in eposidesList["Items"]:
+            if ep["Container"] == "mp4" and ep["MediaType"] == "Audio":
+                ep["Container"] = "m4a"
         xmlStr = Template(podcastTpl).render(basicInfoData=basicInfoData,eps=eposidesList["Items"],baseURL = config["baseURL"],emby_file_server=config["emby_file_server"])
     else:
         return abort(basicInfo.status_code)
@@ -79,7 +82,7 @@ def podcast(id):
 @app.route("/audio/<audiofile>")
 def serverAudio(audiofile):
     audioid,container = audiofile.split(".")
-    if container == "mp3" or container == "mp4":
+    if container == "mp3" or container == "m4a":
         print("mp3 container, direct stream.")
         return redirect("{emby_file_server}/emby/Audio/{audioid}/stream?api_key={api_key}&static=true".format(api_key=config["api_key"],emby_file_server=config["emby_file_server"],audioid=audioid),302)
     else:
