@@ -79,7 +79,7 @@ def podcast(id):
 @app.route("/audio/<audiofile>")
 def serverAudio(audiofile):
     audioid,container = audiofile.split(".")
-    if container == "mp3":
+    if container == "mp3" or container == "mp4":
         print("mp3 container, direct stream.")
         return redirect("{emby_file_server}/emby/Audio/{audioid}/stream?api_key={api_key}&static=true".format(api_key=config["api_key"],emby_file_server=config["emby_file_server"],audioid=audioid),302)
     else:
