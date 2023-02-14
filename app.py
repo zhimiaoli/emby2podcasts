@@ -4,6 +4,7 @@ import requests
 import os
 import json
 import sys
+from datetime import datetime,timedelta
 app = Flask(__name__)
 
 podcastTpl = """<?xml version="1.0" encoding="UTF-8"?>
@@ -28,8 +29,8 @@ podcastTpl = """<?xml version="1.0" encoding="UTF-8"?>
     <title>{{ep.get("IndexNumber",count.value)}}{{"."+ep["Name"]|e}}</title>
     <itunes:summary><![CDATA[ {{ep.get("Overview","")}}]]></itunes:summary>
     <description><![CDATA[ {{ep.get("Overview","")}}]]></description>
-    <enclosure url="{{baseURL}}{{'/audio/'+ep['Id']}}.{{ep['Container']}}" type="audio/mpeg"></enclosure>
-    <pubDate>Tue, 07 Feb 2023 16:01:07 +0000</pubDate>
+    <enclosure url="{{baseURL}}{{'/audio/'+ep['Id']}}.{{ep['Container']}}" type="audio/{% if ep["Container"] == "m4a" %}mp4{% else %}mpeg{% endif %}"></enclosure>
+    <pubDate>{{ep["pubDate"]}} GMT</pubDate>
     <itunes:author>{{basicInfoData.get("AlbumArtist","Unknow")}}</itunes:author>
     <itunes:duration>{{(ep["RunTimeTicks"]/10000000)|int}}</itunes:duration>
     <itunes:explicit>no</itunes:explicit>
@@ -71,9 +72,15 @@ def podcast(id):
     if basicInfo.status_code == 200 and eposides.status_code == 200:
         basicInfoData = basicInfo.json()
         eposidesList = eposides.json()
+        epindex = 1
         for ep in eposidesList["Items"]:
             if ep["Container"] == "mp4" and ep["MediaType"] == "Audio":
                 ep["Container"] = "m4a"
+            pubDate = datetime(2023,2,8,2,23,3) - timedelta(days=epindex)
+            #using a fixed date,so no need to refresh the rss file,this is the date I finished a first working version
+            #of this simple program. no timezone info was provided.
+            ep["pubDate"] = pubDate.strftime("%a, %d %b %Y %H:%M:%S")
+            epindex += 1
         xmlStr = Template(podcastTpl).render(basicInfoData=basicInfoData,eps=eposidesList["Items"],baseURL = config["baseURL"],
                                              emby_file_server=config["emby_file_server"],emby_image_server=config["emby_image_server"])
     else:
