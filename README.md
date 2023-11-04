@@ -1,6 +1,6 @@
 # Intro
 
-Emby2podcasts convert your emby audiobook alumn into a podcast compatible xml file,so you can your favoriate podcast app to enjoy your audiobook collection.
+Emby2podcasts convert your emby audiobook into a podcast compatible xml file,so you can use your favoriate podcast app to enjoy your audiobook collection.
 
 ## Features
 
